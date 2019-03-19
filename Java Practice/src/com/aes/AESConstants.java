@@ -2,7 +2,33 @@ package com.aes;
 
 public class AESConstants {
 
+	
+	public static String str2Hex(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        for (int i=0; i<bytes.length; i++) {
+            sb.append(String.format("%02X",bytes[i]));
+        }
+        return sb.toString();
+    }
+	
+	public static String hex2Str(String hex){
 
+		  StringBuilder sb = new StringBuilder();
+		  StringBuilder temp = new StringBuilder();
+		  
+		  for( int i=0; i<hex.length()-1; i+=2 ){
+			  
+		      String output = hex.substring(i, (i + 2));
+		      int decimal = Integer.parseInt(output, 16);
+		      sb.append((char)decimal);
+			  
+		      temp.append(decimal);
+		  }
+		  
+		  return sb.toString();
+	  }
+
+	
 	/**
      * S-BOX table used for Key Expansion and Sub-Bytes.
      */

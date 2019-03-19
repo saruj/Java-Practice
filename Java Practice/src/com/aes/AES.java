@@ -1,6 +1,8 @@
 package com.aes;
 
-import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.math.BigInteger;
 import java.util.Scanner;
 
 import com.aes.AESConstants.Mode;
@@ -12,28 +14,14 @@ public class AES {
     static String key = "F22B519C52CCE3967DC734949ACFE9BB";
     static String iv =  "78338E4A1B883645DF6E11D2E9237FC3";
     static String ftw = "";
+    static BufferedReader  input;
     static Mode mode;
-    static int keyFileIndex = 1; //Index where the keyFile argument should be. Used to determines the index of other arguments.
  
-    public static String str2Hex(String bin) {
-        char[] digital = "0123456789ABCDEF".toCharArray();
-        StringBuffer sb = new StringBuffer("");
-        byte[] bs = bin.getBytes();
-        int bit;
-        for (int i = 0; i < bs.length; i++) {
-            bit = (bs[i] & 0x0f0) >> 4;
-            sb.append(digital[bit]);
-            bit = bs[i] & 0x0f;
-            sb.append(digital[bit]);
-        }
-        return sb.toString();
-    }
     
-    public static void main(String args[]) throws IOException 
+    public static void main(String args[]) throws Exception 
     {
         
-        
-        int keysizecheck = 128; 
+        //int keysizecheck = 128; 
         mode = Mode.CBC;
         
         @SuppressWarnings("resource")
@@ -46,20 +34,29 @@ public class AES {
         }else if(en_de.equals("D")) {
         	System.out.println("Enter your text to decrypt:");
         }
-        String  inputStr = sc.nextLine();
         
+        //String  inputStr = sc.nextLine();
         
-            
+        input = new BufferedReader(new InputStreamReader(System.in));
+        String  inputStr = input.readLine();
+        
+        if(inputStr.length() > 32){
+        	throw new Exception("Input text size should be less than or equal to 32");
+        }
+          
         AES aes = new AES();
         if(en_de.equals("E")) 
         {
         	
-        	//String inputHex = str2Hex(inputStr.toString());
-        	String inputHex = inputStr.toString();
+        	String inputHex = AESConstants.str2Hex(inputStr.getBytes());
+        	BigInteger value = new BigInteger(inputHex, 16);
+        	
+        	//String inputHex = inputStr.toString();
         	
             int numRounds = 10 ;
             int[][] state, initvector = new int[4][4];
             int[][] keymatrix = aes.keySchedule(key);
+            
             if(mode == Mode.CBC)
             {
                 for (int i = 0; i < 4; i++)
@@ -72,10 +69,9 @@ public class AES {
             while (inputHex != null) {
                 
                     if (inputHex.length() < 32) {
-                    	inputHex = String.format("%032x",Integer.parseInt(inputStr, 16));
+                    	inputHex = String.format("%032x",value);
                     }
                    
-                    
                     state = new int[4][4];
                     for (int i = 0; i < 4; i++) //Parses line into a matrix
                     {
@@ -106,7 +102,7 @@ public class AES {
                     }
                     
                     inputHex = null;
-                    
+                  
                     System.out.println(MatrixToString(state) + AESConstants.newline);
                     
                  
@@ -160,7 +156,7 @@ public class AES {
                 
                 inputStr = null;
                 
-                System.out.println(MatrixToString(state) + AESConstants.newline);
+                System.out.println(AESConstants.hex2Str(MatrixToString(state)));
             }
         } 
         else 
